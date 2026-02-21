@@ -78,7 +78,7 @@ This installs:
 ### Download a single ETF
 
 ```bash
-uv run etf download A200.AX --start 2019-01-01 --end 2024-01-01
+uv run etf A200.AX --start 2019-01-01 --end 2024-01-01
 ```
 
 Output:
@@ -92,7 +92,7 @@ A200_AX_1d_20190101_20240101.csv
 ### Download multiple ETFs (separate files)
 
 ```bash
-uv run etf download A200.AX VAS.AX IVV.AX --start 2015-01-01
+uv run etf A200.AX VAS.AX IVV.AX --start 2015-01-01
 ```
 
 Outputs:
@@ -108,7 +108,7 @@ IVV_AX_1d_20150101_20260221.csv
 ### Download multiple ETFs into one combined file
 
 ```bash
-uv run etf download A200.AX VAS.AX IVV.AX --combined
+uv run etf A200.AX VAS.AX IVV.AX --combined
 ```
 
 Output:
