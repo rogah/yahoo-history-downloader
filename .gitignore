@@ -1,0 +1,32 @@
+# Bytecode / cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+.Python
+
+# Package metadata (editable installs)
+*.egg-info/
+*.egg
+.eggs/
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Build / dist
+build/
+dist/
+*.whl
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+*.swp
+*.swo
+
+# Optional: local env / secrets
+.env
+.env.local
