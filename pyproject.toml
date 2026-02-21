@@ -10,3 +10,9 @@ dependencies = [
     "typer[all]>=0.24.0",
     "yfinance>=1.2.0",
 ]
+
+[project.scripts]
+etf = "etf_downloader.cli:main"
+
+[tool.uv]
+package = true

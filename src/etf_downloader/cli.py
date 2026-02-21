@@ -3,10 +3,13 @@ import yfinance as yf
 from datetime import datetime
 import pandas as pd
 
+app = typer.Typer()
+
 def sanitize_date(date_str: str) -> str:
     return date_str.replace("-", "")
 
-def main(
+@app.command()
+def download(
     tickers: list[str],
     start: str = "2000-01-01",
     end: str = datetime.today().strftime("%Y-%m-%d"),
@@ -15,7 +18,6 @@ def main(
 ):
     """
     Download historical data for one or more ETFs using yfinance.
-    Output filenames always include period range to avoid conflicts.
     """
 
     typer.echo(f"Downloading {', '.join(tickers)} from {start} to {end} ({interval})...")
@@ -37,7 +39,6 @@ def main(
     start_clean = sanitize_date(start)
     end_clean = sanitize_date(end)
 
-    # Single ticker case
     if len(tickers) == 1:
         ticker = tickers[0]
         filename = f"{ticker.replace('.', '_')}_{interval}_{start_clean}_{end_clean}.csv"
@@ -45,7 +46,6 @@ def main(
         typer.echo(f"Saved {filename}")
         return
 
-    # Multiple tickers
     if combined:
         filename = f"combined_{interval}_{start_clean}_{end_clean}.csv"
         df.to_csv(filename)
@@ -57,5 +57,8 @@ def main(
             ticker_df.to_csv(filename)
             typer.echo(f"Saved {filename}")
 
+def main():
+    app()
+
 if __name__ == "__main__":
-    typer.run(main)
+    main()

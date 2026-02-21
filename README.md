@@ -14,17 +14,17 @@ Built with:
 ## 🚀 Features
 
 * Download one or multiple tickers
-* Supports custom date ranges
-* Supports daily / weekly / monthly intervals
-* Automatic period-safe filenames
+* Custom date ranges
+* Daily / weekly / monthly intervals
+* Period-safe filenames (no accidental overwrites)
 * Optional combined multi-ticker output
-* Clean CLI interface
+* Proper CLI entrypoint (`etf` command)
 
 ---
 
 ## 📦 Installation
 
-### 1. Install `uv` (if not already installed)
+### 1️⃣ Install `uv` (if not already installed)
 
 ```bash
 brew install uv
@@ -38,7 +38,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 ---
 
-### 2. Clone the repository
+### 2️⃣ Clone the repository
 
 ```bash
 git clone <your-repo-url>
@@ -47,11 +47,29 @@ cd yahoo-history-downloader
 
 ---
 
-### 3. Install dependencies
+### 3️⃣ Enable packaging mode (already configured)
+
+The project uses:
+
+```toml
+[tool.uv]
+package = true
+```
+
+This allows CLI entrypoints to be installed.
+
+---
+
+### 4️⃣ Install dependencies & CLI entrypoint
 
 ```bash
 uv sync
 ```
+
+This installs:
+
+* Dependencies
+* The `etf` CLI command
 
 ---
 
@@ -60,10 +78,10 @@ uv sync
 ### Download a single ETF
 
 ```bash
-uv run python src/main.py A200.AX --start 2019-01-01 --end 2024-01-01
+uv run etf download A200.AX --start 2019-01-01 --end 2024-01-01
 ```
 
-Example output:
+Output:
 
 ```
 A200_AX_1d_20190101_20240101.csv
@@ -74,7 +92,7 @@ A200_AX_1d_20190101_20240101.csv
 ### Download multiple ETFs (separate files)
 
 ```bash
-uv run python src/main.py A200.AX VAS.AX IVV.AX --start 2015-01-01
+uv run etf download A200.AX VAS.AX IVV.AX --start 2015-01-01
 ```
 
 Outputs:
@@ -90,7 +108,7 @@ IVV_AX_1d_20150101_20260221.csv
 ### Download multiple ETFs into one combined file
 
 ```bash
-uv run python src/main.py A200.AX VAS.AX IVV.AX --combined
+uv run etf download A200.AX VAS.AX IVV.AX --combined
 ```
 
 Output:
@@ -107,21 +125,18 @@ combined_1d_20000101_20260221.csv
 | ------------ | ----------------------------------------- | ---------- |
 | `--start`    | Start date (YYYY-MM-DD)                   | 2000-01-01 |
 | `--end`      | End date (YYYY-MM-DD)                     | Today      |
-| `--interval` | Data interval (`1d`, `1wk`, `1mo`)        | 1d         |
+| `--interval` | `1d`, `1wk`, `1mo`                        | 1d         |
 | `--combined` | Combine multi-ticker output into one file | False      |
 
 ---
 
 ## 📁 Output Format
 
-* CSV format
-* Includes: Open, High, Low, Close, Adj Close, Volume
-* Filenames include:
+Files are always named using:
 
-  * Ticker
-  * Interval
-  * Start date
-  * End date
+```
+{TICKER}_{INTERVAL}_{START}_{END}.csv
+```
 
 Example:
 
@@ -129,15 +144,11 @@ Example:
 A200_AX_1d_20190101_20240101.csv
 ```
 
-This prevents file overwrites and makes datasets self-describing.
+This ensures:
 
----
-
-## 📊 Data Source
-
-Data is retrieved via the `yfinance` library, which wraps Yahoo Finance’s historical data endpoints.
-
-This tool is intended for personal research and educational use.
+* No file overwrite conflicts
+* Self-describing datasets
+* Easy version tracking
 
 ---
 
@@ -150,36 +161,38 @@ yahoo-history-downloader/
 ├── uv.lock
 ├── README.md
 └── src/
-    └── main.py
+    └── etf_downloader/
+        ├── __init__.py
+        └── cli.py
 ```
 
 ---
 
-## 🧠 Why `yfinance`?
+## 📊 Data Source
 
-Yahoo’s raw download endpoints require cookies and crumb tokens.
-`yfinance` handles:
+Data is retrieved using the `yfinance` library, which handles:
 
-* Session management
-* Crumb retrieval
-* Retries
+* Yahoo session management
+* Crumb tokens
 * Rate limiting
+* Retry logic
 
-This keeps the CLI simple and reliable.
+This avoids the need to manually handle Yahoo’s protected endpoints.
 
 ---
 
-## 📌 Future Improvements
+## 🧠 Future Improvements
 
 Potential extensions:
 
 * Portfolio return & CAGR calculation
 * Drawdown analysis
 * Sharpe ratio computation
-* Period shorthand (`--period 5y`)
+* `--period 5y` shorthand
 * Parquet output support
 * Scheduled automation
 * Portfolio backtesting mode
+* `etf version` command
 
 ---
 
