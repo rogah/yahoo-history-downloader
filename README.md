@@ -75,10 +75,25 @@ This installs:
 
 ## 🖥 Usage
 
+All downloads use the `download` subcommand:
+
+```bash
+uv run etf download TICKER [TICKER ...] [OPTIONS]
+```
+
+Get help anytime:
+
+```bash
+uv run etf --help
+uv run etf download --help
+```
+
+---
+
 ### Download a single ETF
 
 ```bash
-uv run etf A200.AX --start 2019-01-01 --end 2024-01-01
+uv run etf download A200.AX --start 2019-01-01 --end 2024-01-01
 ```
 
 Output:
@@ -92,7 +107,7 @@ A200_AX_1d_20190101_20240101.csv
 ### Download multiple ETFs (separate files)
 
 ```bash
-uv run etf A200.AX VAS.AX IVV.AX --start 2015-01-01
+uv run etf download A200.AX VAS.AX IVV.AX --start 2015-01-01
 ```
 
 Outputs:
@@ -108,7 +123,7 @@ IVV_AX_1d_20150101_20260221.csv
 ### Download multiple ETFs into one combined file
 
 ```bash
-uv run etf A200.AX VAS.AX IVV.AX --combined
+uv run etf download A200.AX VAS.AX IVV.AX --combined
 ```
 
 Output:
@@ -119,14 +134,33 @@ combined_1d_20000101_20260221.csv
 
 ---
 
+### Other examples
+
+Custom interval (weekly) and output directory:
+
+```bash
+uv run etf download IVV.AX --interval 1wk --output ~/data
+```
+
+Save to a specific file (single ticker only):
+
+```bash
+uv run etf download A200.AX -o ./my_data.csv
+```
+
+---
+
 ## ⚙ CLI Options
 
-| Option       | Description                               | Default    |
-| ------------ | ----------------------------------------- | ---------- |
-| `--start`    | Start date (YYYY-MM-DD)                   | 2000-01-01 |
-| `--end`      | End date (YYYY-MM-DD)                     | Today      |
-| `--interval` | `1d`, `1wk`, `1mo`                        | 1d         |
-| `--combined` | Combine multi-ticker output into one file | False      |
+Options apply to `etf download`:
+
+| Option       | Short | Description                               | Default    |
+| ------------ | ----- | ----------------------------------------- | ---------- |
+| `--start`    | `-s`  | Start date (YYYY-MM-DD)                   | 2000-01-01 |
+| `--end`      | `-e`  | End date (YYYY-MM-DD)                     | Today      |
+| `--interval` | `-i`  | `1d`, `1wk`, `1mo`                        | 1d         |
+| `--combined` | `-c`  | Combine multi-ticker output into one file | False      |
+| `--output`   | `-o`  | Output file or directory                  | Current dir |
 
 ---
 

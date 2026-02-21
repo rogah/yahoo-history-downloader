@@ -1,25 +1,31 @@
 import typer
 import yfinance as yf
 from datetime import datetime
-import pandas as pd
+from pathlib import Path
 
-app = typer.Typer()
+app = typer.Typer(help="Download historical ETF/stock data from Yahoo Finance.")
+
+@app.callback()
+def _main():
+    """ETF history downloader."""
+    pass
 
 def sanitize_date(date_str: str) -> str:
     return date_str.replace("-", "")
 
+def build_filename(ticker: str, interval: str, start: str, end: str) -> str:
+    return f"{ticker.replace('.', '_')}_{interval}_{sanitize_date(start)}_{sanitize_date(end)}.csv"
+
 @app.command()
 def download(
-    tickers: list[str],
-    start: str = "2000-01-01",
-    end: str = datetime.today().strftime("%Y-%m-%d"),
-    interval: str = "1d",
-    combined: bool = False,
+    tickers: list[str] = typer.Argument(..., help="Ticker symbol(s), e.g. A200.AX IVV.AX"),
+    start: str = typer.Option("2000-01-01", "--start", "-s", help="Start date (YYYY-MM-DD)"),
+    end: str | None = typer.Option(None, "--end", "-e", help="End date (YYYY-MM-DD)"),
+    interval: str = typer.Option("1d", "--interval", "-i", help="Interval: 1d, 1wk, 1mo"),
+    combined: bool = typer.Option(False, "--combined", "-c", help="Combine multi-ticker output into one file"),
+    output: str | None = typer.Option(None, "--output", "-o", help="Output file or directory"),
 ):
-    """
-    Download historical data for one or more ETFs using yfinance.
-    """
-
+    end = end or datetime.today().strftime("%Y-%m-%d")
     typer.echo(f"Downloading {', '.join(tickers)} from {start} to {end} ({interval})...")
 
     df = yf.download(
@@ -36,29 +42,28 @@ def download(
         typer.echo("No data returned.")
         raise typer.Exit(1)
 
-    start_clean = sanitize_date(start)
-    end_clean = sanitize_date(end)
+    out = Path(output).expanduser() if output else Path.cwd()
+    if output:
+        (out if out.suffix == "" else out.parent).mkdir(parents=True, exist_ok=True)
 
     if len(tickers) == 1:
         ticker = tickers[0]
-        filename = f"{ticker.replace('.', '_')}_{interval}_{start_clean}_{end_clean}.csv"
-        df.to_csv(filename)
-        typer.echo(f"Saved {filename}")
+        final = out if (output and out.suffix) else out / build_filename(ticker, interval, start, end)
+        df.to_csv(final)
+        typer.echo(f"Saved {final}")
         return
 
     if combined:
-        filename = f"combined_{interval}_{start_clean}_{end_clean}.csv"
-        df.to_csv(filename)
-        typer.echo(f"Saved {filename}")
-    else:
-        for ticker in tickers:
-            ticker_df = df[ticker].dropna(how="all")
-            filename = f"{ticker.replace('.', '_')}_{interval}_{start_clean}_{end_clean}.csv"
-            ticker_df.to_csv(filename)
-            typer.echo(f"Saved {filename}")
+        final = out if (output and out.suffix) else out / build_filename("combined", interval, start, end)
+        df.to_csv(final)
+        typer.echo(f"Saved {final}")
+        return
 
-def main():
-    app()
+    if output and out.suffix:
+        raise typer.Exit("Error: --output must be a directory when saving multiple separate files.")
 
-if __name__ == "__main__":
-    main()
+    for ticker in tickers:
+        ticker_df = df[ticker].dropna(how="all")
+        final = out / build_filename(ticker, interval, start, end)
+        ticker_df.to_csv(final)
+        typer.echo(f"Saved {final}")

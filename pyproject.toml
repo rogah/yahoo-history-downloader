@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [project.scripts]
-etf = "etf_downloader.cli:main"
+etf = "etf_downloader.cli:app"
 
 [tool.uv]
 package = true
